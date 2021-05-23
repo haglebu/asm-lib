@@ -1,5 +1,5 @@
 # asm-lib
-My assembler programs and library files.
+My assembler programs and library files. I use the Microsoft Assembler MASM version 5.10.
 
 # Program Files
 ## mi.asm
