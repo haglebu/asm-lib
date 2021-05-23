@@ -42,15 +42,15 @@ CODE_SEG        ENDS
 ; S_ = STRING; MUST END WITH 0H BECAUSE OF WRITE_STRING
 ;-----------------------------------------------------------------
 DATA_SEG        SEGMENT PUBLIC
-S_VER           DB 'MI-MEDIA INFORMATION, '
-                DB 'VERSION 1.0.(09), '
-                DB '(C) 2021, '
-                DB 'THOMAS BRASE', 0H
-S_NLW           DB 'DRIVE NUMBER       : ', 0H           
-S_MDS           DB 'MEDIA DESCRIPTOR   : ', 0H
-S_BPS           DB 'BYTES PER SECTOR   : ', 0H
-S_NCL           DB 'NUMBER OF CLUSTERS : ', 0H
-S_SPC           DB 'SECTORS PER CLUSTER: ', 0H
+S_VER           DB 'MI-Media Information, '
+                DB 'V1.0.(09), '
+                DB 'CC BY-NC-SA 4.0, '
+                DB 'Thomas Brase, 2021', 0H
+S_NLW           DB 'drive number       : ', 0H           
+S_MDS           DB 'media descriptor   : ', 0H
+S_BPS           DB 'bytes per sector   : ', 0H
+S_NCL           DB 'number of clusters : ', 0H
+S_SPC           DB 'sectors per cluster: ', 0H
 DATA_SEG        ENDS
 
 

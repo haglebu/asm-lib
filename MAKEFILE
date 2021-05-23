@@ -1,4 +1,5 @@
 # Assembler
+# Microsoft Macro Assembler (MASM) Version 5.10
 CC=masm
 CF=/A
 
