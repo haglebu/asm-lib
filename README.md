@@ -1,8 +1,15 @@
 # asm-lib
 My assembler programs and library files.
 
-# In Usage
-## Files: video.asm, cursor.asm
+# Program Files
+## mi.asm
+Write media information (MI) about drive B: to the screen. The drive is currently static; this will be changed later.
+
+# Library Files
+## media.asm
+This file contains the procedures for writing drive media information to the screen: media descriptor byte, bytes per sector, total number of clusters and sectores per cluster.
+
+## video.asm, cursor.asm
 
 PETER NORTON'S ASSEMBLERBUCH (PNAB)<br>
 MARKT & TECHNIK VERLAG AG, 1988<br>
