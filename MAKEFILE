@@ -1,0 +1,25 @@
+# Assembler
+CC=masm
+CF=/A
+
+# Linker
+LK=link
+LF=/map
+
+mi.obj:	mi.asm
+	$(CC) mi $(CF);
+
+video.obj:	video.asm
+	$(CC) video $(CF);
+
+cursor.obj:	cursor.asm
+	$(CC) cursor $(CF);
+
+media.obj:	media.asm
+	$(CC) media $(CF);
+
+
+mi.com:	mi.obj video.obj cursor.obj media.obj
+	$(LK) mi video cursor media $(LF);
+	exe2bin mi mi.com
+	del mi.exe
