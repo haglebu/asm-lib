@@ -38,14 +38,14 @@ CODE_SEG    SEGMENT PUBLIC          ; CODE SEGMENT STARTS HERE
 
 
 ;================================================================;
-     PUBLIC    DISP_HALF_SECTOR
-     EXTRN     SEND_CRLF:NEAR
+    PUBLIC  DISP_HALF_SECTOR
+    EXTRN   SEND_CRLF:NEAR
 ;----------------------------------------------------------------;
-; DIESE PROZEDUR GIBT EINEN HALBEN SEKTOR (256 BYTE) AUS.        ;
-;    DS:DX     OFFSET IN SECTOR, IN BYTES -- SOLLTE EIN          ;
-;              VIELFACHES VON 16 SEIN                            ;
+; THIS PROCEDURE OUTPUTS HALF A SECTOR (256 BYTES).              ;
+;    DS:DX      OFFSET IN SECTOR, IN BYTES                       ;
+;               SHOULD BE A MULTIPLE OF 16                       ;
 ;                                                                ;
-; BENUTZT:          DISP_LINE, SEND_CRLF                         ;
+; USES:         DISP_LINE, SEND_CRLF                             ;
 ;----------------------------------------------------------------;
 DISP_HALF_SECTOR    PROC NEAR
      PUSH   CX
@@ -65,19 +65,19 @@ DISP_HALF_SECTOR    ENDP
 
 
 ;================================================================;
-     PUBLIC    DISP_BPB
-     EXTRN     SEND_CRLF:NEAR
+    PUBLIC  DISP_BPB
+    EXTRN   SEND_CRLF:NEAR
 ;----------------------------------------------------------------;
-; DIESE PROZEDUR GIBT EINEN HALBEN SEKTOR (256 BYTE) AUS.        ;
-;    DS:DX     OFFSET IN SECTOR, IN BYTES -- SOLLTE EIN          ;
-;              VIELFACHES VON 16 SEIN                            ;
+; THIS PROCEDURE OUTPUTS BIOS PARAMETER BLOCK (64 BYTES).        ;
+;    DS:DX      OFFSET IN SECTOR, IN BYTES                       ;
+;               SHOULD BE A MULTIPLE OF 16                       ;
 ;                                                                ;
-; BENUTZT:          DISP_LINE, SEND_CRLF                         ;
+; USES:         DISP_LINE, SEND_CRLF                             ;
 ;----------------------------------------------------------------;
 DISP_BPB    PROC NEAR
     PUSH    CX
     PUSH    DX
-    MOV     CX,4               ; DISPLAY 4 LINES / 4X16 BYTE
+    MOV     CX,4               ; ONLY 4 LINES / 4X16 BYTE
 BPB:
     CALL    DISP_LINE
     CALL    SEND_CRLF
@@ -92,52 +92,52 @@ DISP_BPB    ENDP
 
 
 ;================================================================;
-     PUBLIC    DISP_LINE
-     EXTRN     WRITE_HEX:NEAR
-     EXTRN     WRITE_CHAR:NEAR
+    PUBLIC  DISP_LINE
+    EXTRN   WRITE_HEX:NEAR
+    EXTRN   WRITE_CHAR:NEAR
 ;----------------------------------------------------------------;
-; DIESE PROZEDUR GIBT EINE ZEILE (16 BYTE) AUS. UND ZWAR ZUERST  ;
-; IM HEX- UND DANN IM ASCII-FORMAT.                              ;
-;    DS:DX     OFFSET ZU DEN DATEN SECTOR.                       ;
-; BENUTZT:          WRITE_CHAR, WRITE_HEX                        ;
-; LIEST:            SECTOR                                       ;
+; THIS PROCEDURE DISPLAYS ONE LINE (16 BYTE).                    ;
+; FIRST IN HEX- THEN IN ASCII-FORMAT.                            ;
+;    DS:DX      OFFSET TO DATA SECTOR                            ;
+; USES:         WRITE_CHAR, WRITE_HEX                            ;
+; READS:        SECTOR                                           ;
 ;----------------------------------------------------------------;
 DISP_LINE PROC NEAR
-     PUSH BX
-     PUSH CX
-     PUSH DX
-     MOV  BX,DX               ;OFFSET IST IN BX SINNVOLLER
-     MOV  CX,16               ;ANZAHL DER AUSZUGEBENDEN BYTES
-     PUSH BX                  ;OFFSET FšR ASCII_LOOP SICHERN
+    PUSH    BX
+    PUSH    CX
+    PUSH    DX
+    MOV     BX,DX               ;OFFSET IST IN BX SINNVOLLER
+    MOV     CX,16               ;ANZAHL DER AUSZUGEBENDEN BYTES
+    PUSH    BX                  ;OFFSET FÜR ASCII_LOOP SICHERN
 HEX_LOOP:
-     MOV  DL,SECTOR[BX]       ;HOLE 1 BYTE
-     CALL WRITE_HEX           ;GIB DIESES BYTE IN HEX AUS
-     MOV  DL,' '              ;SCHREIBE EIN LEERZEICHEN ZWISCHEN 
-                              ; DIE ZAHLEN
-     CALL WRITE_CHAR
-     INC  BX
-     LOOP HEX_LOOP
+    MOV     DL,SECTOR[BX]       ;HOLE 1 BYTE
+    CALL    WRITE_HEX           ;GIB DIESES BYTE IN HEX AUS
+    MOV     DL,' '              ;SCHREIBE EIN LEERZEICHEN ZWISCHEN 
+                                ; DIE ZAHLEN
+    CALL    WRITE_CHAR
+    INC     BX
+    LOOP    HEX_LOOP
 
-     MOV  DL,' '              ;FšGE EIN LEERZEICHEN VOR DEM  
-                              ; ZEICHEN AN
-     CALL WRITE_CHAR
-     MOV  CX,16
-     POP  BX                  ;HOLE DEN OFFSET VON SECTOR
+    MOV     DL,' '              ;FÜGE EIN LEERZEICHEN VOR DEM  
+                               ; ZEICHEN AN
+    CALL WRITE_CHAR
+    MOV     CX,16
+    POP     BX                  ;HOLE DEN OFFSET VON SECTOR
 
 ASCII_LOOP:
-     MOV  DL,SECTOR[BX]
-     CALL WRITE_CHAR
-     INC  BX
-     LOOP ASCII_LOOP
+    MOV     DL,SECTOR[BX]
+    CALL    WRITE_CHAR
+    INC     BX
+    LOOP    ASCII_LOOP
 
-     POP  DX
-     POP  CX
-     POP  BX
-     RET
-DISP_LINE ENDP
+    POP     DX
+    POP     CX
+    POP     BX
+    RET
+DISP_LINE   ENDP
 ;================================================================;
 
-CODE_SEG  ENDS                  ; CODE SEGMENT ENDS HERE
+CODE_SEG    ENDS                  ; CODE SEGMENT ENDS HERE
 
      
      
