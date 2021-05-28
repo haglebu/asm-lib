@@ -3,11 +3,15 @@ My assembler programs and library files. I use the Microsoft Assembler MASM vers
 
 # Program Files
 ## mi.asm
-Write media information (MI) about drive B: to the screen. The drive is currently static; this will be changed later.
+Displaying media information (MI) about drive A: to the screen. The drive is currently static; this will be changed later.
 
 # Library Files
 ## media.asm
-This file contains the procedures for writing drive media information to the screen: media descriptor byte, bytes per sector, total number of clusters and sectores per cluster.
+This file contains the procedures for displaying drive media information on the screen:
+- media descriptor byte
+- bytes per sector
+- total number of clusters
+- sectors per cluster.
 
 ## video.asm, cursor.asm
 
