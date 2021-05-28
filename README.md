@@ -11,7 +11,7 @@ This file contains the procedures for displaying drive media information on the 
 - media descriptor byte
 - bytes per sector
 - total number of clusters
-- sectors per cluster.
+- sectors per cluster
 
 ## video.asm, cursor.asm
 
