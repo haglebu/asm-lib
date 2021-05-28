@@ -16,8 +16,8 @@
 ;                                                                ;
 ; READ_SECTOR           READ A SECTOR FROM DISK WITH INT25H      ;
 ; DISP_HALF_SECTOR      DISPLAY A HALF SECTOR (256 BYTE)         ;
-; DISP_BPB              DISPLAY THE BOOT PARAMETER BLOCK (BPB)   ;
-;                       THIS ARE ONLY 2 LINES OR 2X16 BYTES      ;
+; DISP_BPB              DISPLAY THE BIOS PARAMETER BLOCK (BPB)   ;
+;                       THIS ARE ONLY 4 LINES OR 4X16 BYTES      ;
 ; DISP_LINE             DISPLAY ONE LINE (ASCII & HEX)           ;
 ;================================================================;
 
