@@ -9,7 +9,7 @@
 ;----------------------------------------------------------------;
 ; FILENAME      MI.ASM                                           ;
 ;----------------------------------------------------------------;
-; WRITE MEDIA INFORMATION (MI) ABOUT DRIVE B: TO THE SCREEN:     ;
+; DISPLAY MEDIA INFORMATION (MI) ABOUT DRIVE A:                  ;
 ;                                                                ;
 ; USES          VIDEO.ASM (PNAB)                                 ;
 ;               CURSOR.ASM (PNAB)                                ;
@@ -67,8 +67,8 @@ CGROUP  GROUP   CODE_SEG, DATA_SEG
 ; INT 21 DRIVE NUMBERS
 ;-----------------------------------------------------------------
 ;LW     EQU     00H     ; DRIVE C:
-;LW     EQU     01H     ; DRIVE A:
-LW      EQU     02H     ; DRIVE B:
+LW     EQU     01H     ; DRIVE A:
+;LW      EQU     02H     ; DRIVE B:
 
 
 
@@ -107,7 +107,7 @@ CODE_SEG        SEGMENT PUBLIC
 ;-----------------------------------------------------------------
 ; EXTERNAL PROCEDURES   MEDIA.ASM (TBR)
 ;-----------------------------------------------------------------
-        EXTRN   WRITE_MDS:NEAR                  ; USES DL
+	EXTRN   WRITE_MDS:NEAR                  ; USES DL
         EXTRN   WRITE_BPS:NEAR                  ; USES DL
         EXTRN   WRITE_NCL:NEAR                  ; USES DL
         EXTRN   WRITE_SPC:NEAR                  ; USES DL
@@ -121,14 +121,14 @@ CODE_SEG        SEGMENT PUBLIC
 ; ==> INPUT
 ;       AH      1CH FUNCTION CODE
 ;       DL      DRIVE CODE
-;               0 = C:
+;               0 = DEFAULT
 ;               1 = A:
 ;               2 = B:
-; <== OUTPUT
+; <== RETURN
 ;       AL      SECTORS PER CLUSTER
 ;       CX      BYTES PER SECTOR
-;       DX      TOTAL NUMBER OF CLUSTERS
-;       DS:BX   'POINTER' TO MEDIA DESCRIPTOR (FAT-ID-BYTE)
+;       DX      CLUSTERS ON DISK DRIVE
+;       DS:BX   'POINTER' TO MEDIA DESCRIPTOR BYTE (FAT-ID-BYTE)
 ;               ! DS IS CHANGING -> PUSH & POP !
 ;-----------------------------------------------------------------
 

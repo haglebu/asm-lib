@@ -62,10 +62,10 @@ CODE_SEG    SEGMENT PUBLIC
 ;-----------------------------------------------------------------
 ; EXTERNAL PROCEDURES		VIDEO.ASM (PNAB)
 ;-----------------------------------------------------------------
-       EXTRN   WRITE_HEX:NEAR
-       EXTRN   WRITE_DECIMAL:NEAR
-       EXTRN   CURSOR_RIGHT:NEAR
-	   EXTRN   WRITE_STRING:NEAR
+        EXTRN   WRITE_HEX:NEAR
+        EXTRN   WRITE_DECIMAL:NEAR
+        EXTRN   CURSOR_RIGHT:NEAR
+        EXTRN   WRITE_STRING:NEAR
 
 
 
