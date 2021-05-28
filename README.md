@@ -3,7 +3,7 @@ My assembler programs and library files. I use the Microsoft Assembler MASM vers
 
 # Program Files
 ## mi.asm
-Displaying media information (MI) about drive A: to the screen. The drive is currently static; this will be changed later.
+Display media information (MI) about drive A: on screen. The drive is currently static; this will be changed later.
 
 # Library Files
 ## media.asm
