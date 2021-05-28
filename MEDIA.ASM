@@ -60,7 +60,7 @@ CODE_SEG    SEGMENT PUBLIC
 
 
 ;-----------------------------------------------------------------
-; EXTERNAL PROCEDURES		VIDEO.ASM (PNAB)
+; EXTERNAL PROCEDURES           VIDEO.ASM (PNAB)
 ;-----------------------------------------------------------------
         EXTRN   WRITE_HEX:NEAR
         EXTRN   WRITE_DECIMAL:NEAR
@@ -70,7 +70,7 @@ CODE_SEG    SEGMENT PUBLIC
 
 
 ;================================================================;
-	PUBLIC	WRITE_MDS
+        PUBLIC  WRITE_MDS
 ;----------------------------------------------------------------;
 ; THIS PROCEDURE PRINTS THE MEDIA DESCRIPTOR BYTE AS A TWO-DIGIT ;
 ; HEX NUMBER AT THE CURRENT CURSOR POSITION.                     ;
@@ -103,7 +103,7 @@ WRITE_MDS       ENDP
 
 
 ;================================================================;
-	PUBLIC	WRITE_BPS
+        PUBLIC  WRITE_BPS
 ;----------------------------------------------------------------;
 ; THIS PROCEDURE PRINTS THE NUMBER OF BYTES PER SECTOR AT THE    ;
 ; CURRENT CURSOR POSITION.                                       ;
@@ -146,7 +146,7 @@ WRITE_BPS       ENDP
 
 
 ;================================================================;
-	PUBLIC	WRITE_NCL
+        PUBLIC  WRITE_NCL
 ;----------------------------------------------------------------;
 ; THIS PROCEDURE PRINTS THE TOTAL NUMBER OF CYLINDERS OF THE     ;
 ; DRIVE                                                          ;
@@ -178,7 +178,7 @@ WRITE_NCL       ENDP
 
 
 ;================================================================;
-	PUBLIC	WRITE_SPC
+        PUBLIC  WRITE_SPC
 ;----------------------------------------------------------------;
 ; THIS PROCEDURE PRINTS THE SECTORS PER CLUSTER                  ;
 ;                                                                ;

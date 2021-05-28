@@ -107,7 +107,7 @@ CODE_SEG        SEGMENT PUBLIC
 ;-----------------------------------------------------------------
 ; EXTERNAL PROCEDURES   MEDIA.ASM (TBR)
 ;-----------------------------------------------------------------
-	EXTRN   WRITE_MDS:NEAR                  ; USES DL
+        EXTRN   WRITE_MDS:NEAR                  ; USES DL
         EXTRN   WRITE_BPS:NEAR                  ; USES DL
         EXTRN   WRITE_NCL:NEAR                  ; USES DL
         EXTRN   WRITE_SPC:NEAR                  ; USES DL
@@ -203,10 +203,10 @@ START   PROC    NEAR
 ;-----------------------------------------------------------------
 ; 4) WRITE SECTORS PER CLUSTER (SPC)
 ;-----------------------------------------------------------------
-        MOV     DX,OFFSET CGROUP:S_SPC	; STRING
+        MOV     DX,OFFSET CGROUP:S_SPC  ; STRING
         CALL    WRITE_STRING            ; NO CR/LF
         MOV     DL, LW                  ; INPUT DRIVE TO DL
-        CALL    WRITE_SPC		        ; SPC
+        CALL    WRITE_SPC                       ; SPC
         CALL    SEND_CRLF               ; ... NEXT LINE
 
 
@@ -221,7 +221,7 @@ START   PROC    NEAR
 ;=================================================================
 ; FINAL END
 ;=================================================================
-START		ENDP
+START           ENDP
 CODE_SEG        ENDS
         END     START
 ;================================================================;

@@ -7,8 +7,19 @@ CF=/A
 LK=link
 LF=/map
 
+# MAIN PROGRAMS
+bpb.obj:	bpb.asm
+	$(CC) bpb $(CF);
+
 mi.obj:	mi.asm
 	$(CC) mi $(CF);
+
+# LIBRARY
+media.obj:	media.asm
+	$(CC) media $(CF);
+
+sector.obj:	sector.asm
+	$(CC) sector $(CF);
 
 video.obj:	video.asm
 	$(CC) video $(CF);
@@ -16,11 +27,13 @@ video.obj:	video.asm
 cursor.obj:	cursor.asm
 	$(CC) cursor $(CF);
 
-media.obj:	media.asm
-	$(CC) media $(CF);
-
+# EXECUTABLES (COM)
+bpb.com:	bpb.obj sector.obj video.obj cursor.obj
+	$(LK) bpb sector video cursor $(LF);
+	exe2bin bpb bpb.com
 
 mi.com:	mi.obj video.obj cursor.obj media.obj
 	$(LK) mi video cursor media $(LF);
 	exe2bin mi mi.com
-	del mi.exe
+	del *.exe
+	copy makefile makefile.txt
