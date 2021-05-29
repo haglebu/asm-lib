@@ -27,9 +27,12 @@ video.obj:	video.asm
 cursor.obj:	cursor.asm
 	$(CC) cursor $(CF);
 
+keyboard.obj:	keyboard.asm
+	$(CC) keyboard $(CF);
+
 # EXECUTABLES (COM)
-bpb.com:	bpb.obj sector.obj video.obj cursor.obj
-	$(LK) bpb sector video cursor $(LF);
+bpb.com:	bpb.obj sector.obj video.obj cursor.obj keyboard.obj
+	$(LK) bpb sector video cursor keyboard $(LF);
 	exe2bin bpb bpb.com
 
 mi.com:	mi.obj video.obj cursor.obj media.obj

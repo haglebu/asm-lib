@@ -20,7 +20,8 @@
 ; PNAB          PETER NORTON'S ASSEMBLERBUCH (ISBN 3-89090-624-9);
 ;----------------------------------------------------------------;
 ; 25.05.2018    CREATED                                          ;
-; 28.05.2021    DOCUMENTATION
+; 28.05.2021    DOCUMENTATION                                    ;
+; 29.05.2021    INPUT/READ FLOPPY DRIVE NUMBER                   ;
 ;               ...                                              ;
 ;================================================================;
 
@@ -95,11 +96,11 @@ CODE_SEG        ENDS
 ;-----------------------------------------------------------------
 DATA_SEG        SEGMENT PUBLIC
 S_VER           DB 'BPB - BIOS PARAMETER BLOCK, '
-                DB 'V1.0, '
+                DB 'V1.1, '
                 DB 'CC-BY-NC-SA 4.0, '
                 DB 'THOMAS BRASE, 29.05.2021', 0H
+S_FDN           DB 'FLOPPY DRIVE NUMBER    : ', 0H
 
-                                                    ; OFFSET
 S_SID           DB 'SYSTEM ID              : ', 0H  ; 0003 / 8 BYTE
 S_BPS           DB 'BYTES PER SECTOR       : ', 0H  ; 000B / WORD
 S_SPC           DB 'SECTORS PER CLUSTER    : ', 0H  ; 000D / BYTE
@@ -109,7 +110,7 @@ S_TLS           DB 'TOTAL LOGICAL SECTORS  : ', 0H  ; 0013 / WORD
 S_MDS           DB 'MEDIA DESCRIPTOR       : ', 0H  ; 0015 / BYTE
 S_SPT           DB 'SECTORS PER TRACK      : ', 0H  ; 0018 / WORD
 S_NOH           DB 'NUMBER OF HEADS        : ', 0H  ; 001A / WORD
-S_PDN           DB 'PHYSICAL DRIVE NUMBER  : ', 0H  ; 0024 / BYTE
+;S_PDN           DB 'PHYSICAL DRIVE NUMBER  : ', 0H  ; 0024 / BYTE
 S_VSN           DB 'VOLUME SERIAL NUMBER   : ', 0H  ; 0027 / DWORD
 S_VOL           DB 'VOLUME LABEL           : ', 0H  ; 002B / 11 BYTE
 S_FST           DB 'FILE SYSTEM TYPE       : ', 0H  ; 0036 / 8 BYTE
@@ -129,9 +130,10 @@ CGROUP  GROUP   CODE_SEG, DATA_SEG
 
 ;-----------------------------------------------------------------
 ; DEFINE CONSTANTS / NOTE: INT 21 DRIVE NUMBERS !!!
+; NOT NEEDED IN BPB.ASM
 ;-----------------------------------------------------------------
 ;LW     EQU     00H     ; DRIVE C:
-LW     EQU     01H     ; DRIVE A:
+;LW     EQU     01H     ; DRIVE A:
 ;LW     EQU     02H     ; DRIVE B:
 
 
@@ -170,6 +172,12 @@ CODE_SEG        SEGMENT PUBLIC
         EXTRN   CLEAR_SCREEN:NEAR
 
 
+;-----------------------------------------------------------------
+; EXTERNAL PROCEDURES   CURSOR.ASM (PNAB)
+;-----------------------------------------------------------------
+        EXTRN   READ_BYTE:NEAR
+
+
 ;=================================================================
 ; BEGIN MAIN/START
 ;=================================================================
@@ -185,14 +193,26 @@ START   PROC    NEAR
         CALL    SEND_CRLF
 
         MOV     DL,'-'
-        MOV     CX,80D
+        MOV     CX,79D
         CALL    WRITE_CHAR_N_TIMES
+        CALL    SEND_CRLF
+
+        MOV     DX,OFFSET CGROUP:S_FDN  ; INPUT FLOPPY DRIVE NUMBER
+        CALL    WRITE_STRING
+
+        CALL    READ_BYTE           ; READ NUMBER 00 OR 01 TO AX
+        CALL    SEND_CRLF
+
+        MOV     DL,'-'
+        MOV     CX,79D
+        CALL    WRITE_CHAR_N_TIMES
+        CALL    SEND_CRLF
 
 
 ;-----------------------------------------------------------------
 ; READ COMPLETE BOOTSECTOR (512 BYTE) FROM DRIVE A: TO [SECTOR]
 ;-----------------------------------------------------------------
-        MOV     AL,LW-01H           ; DRIVE A (0)
+;                                   ; DRIVE NUMBER IS IN AL
         MOV     CX,1                ; NUMBER OF SECTORS (1) TO READ
         MOV     DX,0                ; THE SECTOR (0) TO READ
         LEA     BX,SECTOR           ; WHERE THE SECTOR SHOULD BE
@@ -204,8 +224,9 @@ START   PROC    NEAR
         CALL    DISP_BPB            ; DISPLAY THE BPB
         
         MOV     DL,'-'
-        MOV     CX,80D
+        MOV     CX,79D
         CALL    WRITE_CHAR_N_TIMES
+        CALL    SEND_CRLF
 
 
 ;-----------------------------------------------------------------
@@ -298,13 +319,13 @@ L_FST:
 ;-----------------------------------------------------------------
 ; WRITE INFORMATION ON SCREEN / PHYS DRIVE NUMBER / +24H / BYTE
 ;-----------------------------------------------------------------
-        MOV     DX,OFFSET CGROUP:S_PDN
-        CALL    WRITE_STRING
-
-        XOR     BX,BX
-        MOV     DL,SECTOR[BX+24H]
-        CALL    WRITE_HEX           ; ONLY 1 BYTE          
-        CALL    SEND_CRLF
+;        MOV     DX,OFFSET CGROUP:S_PDN
+;        CALL    WRITE_STRING
+;
+;        XOR     BX,BX
+;        MOV     DL,SECTOR[BX+24H]
+;        CALL    WRITE_HEX           ; ONLY 1 BYTE          
+;        CALL    SEND_CRLF
 
 
 ;-----------------------------------------------------------------
