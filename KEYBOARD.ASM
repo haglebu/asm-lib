@@ -29,414 +29,413 @@
 CGROUP      GROUP     CODE_SEG, DATA_SEG
             ASSUME    CS:CGROUP, DS:CGROUP
     
-CODE_SEG    SEGMENT PUBLIC
-BS      EQU  8              ;Backspace-Zeichen
-CR      EQU  13             ;Wagenr¸cklauf-Zeichen (Carriage return)
-ESCAPE  EQU  27             ;Flucht-Zeichen (Escape)
+BS          EQU  8              ;BACKSPACE
+CR          EQU  13             ;CARRIAGE RETURN
+ESCAPE      EQU  27             ;ESCAPE
 
 DATA_SEG  SEGMENT PUBLIC
 KEY_BOARD_INPUT     LABEL     BYTE
-CHAR_NUM_LIMIT      DB   0              ;L‰nge des Eingabepuffers
-NUM_CHARS_READ      DB   0              ;Anzahl der eingelesenen Zeichen
-CHARS               DB   80 DUP (0)     ;Buffer f¸r Tastatureingabe
+CHAR_NUM_LIMIT      DB   0              ;LéNGE DES EINGABEPUFFERS
+NUM_CHARS_READ      DB   0              ;ANZAHL DER EINGELESENEN ZEICHEN
+CHARS               DB   80 DUP (0)     ;BUFFER FöR TASTATUREINGABE
 DATA_SEG  ENDS
 
 
 CODE_SEG  SEGMENT PUBLIC
 
 ;================================================================;
-     PUBLIC    READ_CHAR
+    PUBLIC  READ_CHAR
 ;----------------------------------------------------------------;
-; Diese Prozedur liest ein einzelnes Zeichen von der Tastatur,   ;
-; ohne ein Echo an den Bildschirm zu senden.                     ;
+; DIESE PROZEDUR LIEST EIN EINZELNES ZEICHEN VON DER TASTATUR,   ;
+; OHNE EIN ECHO AN DEN BILDSCHIRM ZU SENDEN.                     ;
 ;                                                                ;
-; Ergebnis:    AL   Zeichen, oder 0 fÅr spezielle Tasten         ;
-;              AH   Erweiterter Code der speziellen Tasten       ;
+; ERGEBNIS:    AL   ZEICHEN, ODER 0 FöR SPEZIELLE TASTEN         ;
+;              AH   ERWEITERTER CODE DER SPEZIELLEN TASTEN       ;
 ;                                                                ;
 ;----------------------------------------------------------------;
-READ_CHAR PROC NEAR
-     MOV  AH,7                ;Eingabeanforderung ohne Echo und
-     INT  21h                 ; ohne öberprÅfung auf CTRL_BREAK
-     OR   AL,AL               ;War es eine spezielle Taste?
-     JNZ  DONE_READ_CHAR      ;Nein: dann sind wir fertig
-     INT  21h                 ;Ja: erweiterten Code einlesen
-     MOV  AH,AL               ;Speichere ihn in AH
-     XOR  AL,AL               ;Kennung fÅr erweiterten Code
+READ_CHAR   PROC NEAR
+    MOV     AH,7                ;EINGABEANFORDERUNG OHNE ECHO UND
+    INT     21H                 ; OHNE öBERPRöFUNG AUF CTRL_BREAK
+    OR      AL,AL               ;WAR ES EINE SPEZIELLE TASTE?
+    JNZ     DONE_READ_CHAR      ;NEIN: DANN SIND WIR FERTIG
+    INT     21H                 ;JA: ERWEITERTEN CODE EINLESEN
+    MOV     AH,AL               ;SPEICHERE IHN IN AH
+    XOR     AL,AL               ;KENNUNG FöR ERWEITERTEN CODE
 DONE_READ_CHAR:
-     RET
+    RET
 READ_CHAR ENDP
 ;================================================================;
 
 
 ;================================================================;
-     PUBLIC    STRING_TO_UPPER
+    PUBLIC  STRING_TO_UPPER
 ;----------------------------------------------------------------;
-; Diese Prozedur wandelt eine im DOS Format vorliegende          ;
-; Zeichenkette in Gro·buchstaben um.                             ;
+; DIESE PROZEDUR WANDELT EINE IM DOS FORMAT VORLIEGENDE          ;
+; ZEICHENKETTE IN GRO·BUCHSTABEN UM.                             ;
 ;                                                                ;
-;    DS:DX     Adresse des Puffers der Zeichenkette              ;
+;    DS:DX     ADRESSE DES PUFFERS DER ZEICHENKETTE              ;
 ;                                                                ;
-; Benutzt:     CHAR_TO_UPPER                                     ;
+; BENUTZT:     CHAR_TO_UPPER                                     ;
 ;----------------------------------------------------------------;
-STRING_TO_UPPER          PROC NEAR
-     PUSH AX
-     PUSH BX
-     PUSH CX
-     MOV  BX,DX
-     INC  BX                  ;Zeige auf den ZeichenzÑhler
-     MOV  CL,[BX]             ;Anzahl der Zeichen im 2. Byte des Puffers
-     XOR  CH,CH               ;Oberes Byte des ZÑhlers lîschen
+STRING_TO_UPPER PROC NEAR
+    PUSH    AX
+    PUSH    BX
+    PUSH    CX
+    MOV     BX,DX
+    INC     BX                  ;ZEIGE AUF DEN ZEICHENZéHLER
+    MOV     CL,[BX]             ;ANZAHL DER ZEICHEN IM 2. BYTE DES PUFFERS
+    XOR     CH,CH               ;OBERES BYTE DES ZéHLERS LôSCHEN
 UPPER_LOOP:
-     INC  BX                  ;Zeige auf das nÑchste Zeichen im Puffer
-     MOV  AL,[BX]             ;Hole ein Zeichen der Zeichenkette
-     CALL CHAR_TO_UPPER       ;In Gro·buchstaben umwandeln
-     MOV  [BX],AL             ;Schreibe Zeichen in Zeichenkette zurÅck
-     LOOP UPPER_LOOP
-     POP  CX
-     POP  BX
-     POP  AX
-     RET
-STRING_TO_UPPER          ENDP
+    INC     BX                  ;ZEIGE AUF DAS NéCHSTE ZEICHEN IM PUFFER
+    MOV     AL,[BX]             ;HOLE EIN ZEICHEN DER ZEICHENKETTE
+    CALL    CHAR_TO_UPPER       ;IN GRO·BUCHSTABEN UMWANDELN
+    MOV     [BX],AL             ;SCHREIBE ZEICHEN IN ZEICHENKETTE ZURöCK
+    LOOP    UPPER_LOOP
+    POP     CX
+    POP     BX
+    POP     AX
+    RET
+STRING_TO_UPPER     ENDP
 ;================================================================;
 
 
 ;================================================================;
-     PUBLIC    CHAR_TO_UPPER
+    PUBLIC    CHAR_TO_UPPER
 ;----------------------------------------------------------------;
-; Diese Prozedur wandelt ein einzelnes Zeichen in einen          ;
-; Gro·buchstaben um.                                             ;
+; DIESE PROZEDUR WANDELT EIN EINZELNES ZEICHEN IN EINEN          ;
+; GRO·BUCHSTABEN UM.                                             ;
 ;                                                                ;
-; Eingabe:     AL   umzuwandelndes Zeichen                       ;
-; Ausgabe:     AL   entsprechender Gro·buchstabe                 ;
+; EINGABE:     AL   UMZUWANDELNDES ZEICHEN                       ;
+; AUSGABE:     AL   ENTSPRECHENDER GRO·BUCHSTABE                 ;
 ;----------------------------------------------------------------;
-CHAR_TO_UPPER  PROC NEAR
-     CMP  AL,'a'              ;Ist dies ein Kleinbuchstabe?
-     JB   NOT_LOWER           ;Nein: dann sind wir fertig
-     CMP  AL,'z'              ;Ist dies ein Kleinbuchstabe?
-     JA   NOT_LOWER           ;Nein: dann sind wir fertig
-     ADD  AL,'A'-'a'          ;In Gro·buchstabe umwandeln
+CHAR_TO_UPPER   PROC NEAR
+    CMP     AL,'A'              ;IST DIES EIN KLEINBUCHSTABE?
+    JB      NOT_LOWER           ;NEIN: DANN SIND WIR FERTIG
+    CMP     AL,'Z'              ;IST DIES EIN KLEINBUCHSTABE?
+    JA      NOT_LOWER           ;NEIN: DANN SIND WIR FERTIG
+    ADD     AL,'A'-'A'          ;IN GRO·BUCHSTABE UMWANDELN
 NOT_LOWER:
-     RET
-CHAR_TO_UPPER  ENDP
+    RET
+CHAR_TO_UPPER   ENDP
 ;================================================================;
 
 
 ;================================================================;
-     PUBLIC    READ_STRING
-     EXTRN     WRITE_CHAR:NEAR
+    PUBLIC  READ_STRING
+    EXTRN   WRITE_CHAR:NEAR
 ;----------------------------------------------------------------;
-; Diese Prozedur arbeit Ñhnlich wie die DOS Funktion 0AH.        ;
-; Allerdings gibt sie ein besonderes Zeichen - und nicht den     ;
-; TastaturschlÅssel - zurÅck wenn eine Funktionstaste oder eine  ;
-; Taste des Cursor-Blocks betÑtigt wurde. ESC lîscht die Eingabe ;
-; und fordert ein neue Eingabe an.                               ;
+; DIESE PROZEDUR ARBEIT éHNLICH WIE DIE DOS FUNKTION 0AH.        ;
+; ALLERDINGS GIBT SIE EIN BESONDERES ZEICHEN - UND NICHT DEN     ;
+; TASTATURSCHLöSSEL - ZURöCK WENN EINE FUNKTIONSTASTE ODER EINE  ;
+; TASTE DES CURSOR-BLOCKS BETéTIGT WURDE. ESC LôSCHT DIE EINGABE ;
+; UND FORDERT EIN NEUE EINGABE AN.                               ;
 ;                                                                ;
-;    DS:DX     Adresse des Tastatur Puffers. Das erste Byte mu·  ;
-;              die Anzahl der maximal einzulesenden Zeichen      ;
-;              (incl. ein Byte fÅr die [RETURN]) enthalten. Das  ;
-;              zweite Byte wird von der Prozedur zur RÅckmeldung ;
-;              benutzt:                                          ;
-;                   0    Kein Zeichen eingelesen                 ;
-;                  -1    Ein spezielles Zeichen eingelesen       ;
-;                   ansonsten Anzahl der eingelesenen Zeichen    ;
+;    DS:DX     ADRESSE DES TASTATUR PUFFERS. DAS ERSTE BYTE MU·  ;
+;              DIE ANZAHL DER MAXIMAL EINZULESENDEN ZEICHEN      ;
+;              (INCL. EIN BYTE FöR DIE [RETURN]) ENTHALTEN. DAS  ;
+;              ZWEITE BYTE WIRD VON DER PROZEDUR ZUR RöCKMELDUNG ;
+;              BENUTZT:                                          ;
+;                   0    KEIN ZEICHEN EINGELESEN                 ;
+;                  -1    EIN SPEZIELLES ZEICHEN EINGELESEN       ;
+;                   ANSONSTEN ANZAHL DER EINGELESENEN ZEICHEN    ;
 ;                                                                ;
-; Benutzt:     READ_CHAR, BACK_SPACE, WRITE_CHAR                 ;
+; BENUTZT:     READ_CHAR, BACK_SPACE, WRITE_CHAR                 ;
 ;----------------------------------------------------------------;
-READ_STRING    PROC NEAR
-     PUSH AX
-     PUSH BX
-     PUSH SI
-     MOV  SI,DX                    ;Benutze SI als Index-Register und
+READ_STRING PROC NEAR
+    PUSH    AX
+    PUSH    BX
+    PUSH    SI
+    MOV     SI,DX                    ;BENUTZE SI ALS INDEX-REGISTER UND
 START_OVER:
-     MOV  BX,2                     ; BX fÅr den Offset zum Pufferstart
-     CALL READ_CHAR
-     OR   AL,AL                    ;Erweiterter ASCII Code?
-     JZ   EXTENDED                 ;Ja: dementsprechend behandeln
+    MOV     BX,2                     ; BX FöR DEN OFFSET ZUM PUFFERSTART
+    CALL    READ_CHAR
+    OR      AL,AL                    ;ERWEITERTER ASCII CODE?
+    JZ      EXTENDED                 ;JA: DEMENTSPRECHEND BEHANDELN
 NOT_EXTENDED:
-     CMP  AL,CR                    ;Ist Zeichen Carriage-Return
-     JE   END_INPUT                ;Ja: wir sind mit der Eingabe fertig
-     CMP  AL,BS                    ;Ist es ein Backspace?
-     JNE  NOT_BS                   ;Nee
-     CALL BACK_SPACE               ;Ja: Zeichen lîschen
-     CMP  BL,2                     ;Ist der Puffer leer?
-     JE   START_OVER               ;Ja: Nochmal erw. ASCII Code einlesen
-     JMP  SHORT READ_NEXT_CHAR     ;Nein: wieder normale Zeichen einlesen
-NOT_BS:   CMP  AL,ESCAPE           ;Ist es ein ESC ?
-     JE   PURGE_BUFFER             ;Ja: Puffer lîschen
-     CMP  BL,[SI]                  ;öberprÅfe, ob der Puffer voll ist
-     JA   BUFFER_FULL              ;Puffer ist voll
-     MOV  [SI+BX],AL               ;Sonst Zeichen in Puffer speichern
-     INC  BX                       ;Zeige auf die nÑchste freie Stelle
-     PUSH DX
-     MOV  DL,AL                    ;Echo des Zeichens zum Bildschirm
-     CALL WRITE_CHAR
-     POP  DX
+    CMP     AL,CR                    ;IST ZEICHEN CARRIAGE-RETURN
+    JE      END_INPUT                ;JA: WIR SIND MIT DER EINGABE FERTIG
+    CMP     AL,BS                    ;IST ES EIN BACKSPACE?
+    JNE     NOT_BS                   ;NEE
+    CALL    BACK_SPACE               ;JA: ZEICHEN LôSCHEN
+    CMP     BL,2                     ;IST DER PUFFER LEER?
+    JE      START_OVER               ;JA: NOCHMAL ERW. ASCII CODE EINLESEN
+    JMP     SHORT READ_NEXT_CHAR     ;NEIN: WIEDER NORMALE ZEICHEN EINLESEN
+NOT_BS:     CMP  AL,ESCAPE           ;IST ES EIN ESC ?
+    JE      PURGE_BUFFER             ;JA: PUFFER LôSCHEN
+    CMP     BL,[SI]                  ;öBERPRöFE, OB DER PUFFER VOLL IST
+    JA      BUFFER_FULL              ;PUFFER IST VOLL
+    MOV     [SI+BX],AL               ;SONST ZEICHEN IN PUFFER SPEICHERN
+    INC     BX                       ;ZEIGE AUF DIE NéCHSTE FREIE STELLE
+    PUSH    DX
+    MOV     DL,AL                    ;ECHO DES ZEICHENS ZUM BILDSCHIRM
+    CALL    WRITE_CHAR
+    POP     DX
 READ_NEXT_CHAR:
-     CALL READ_CHAR
-     OR   AL,AL                    ;Ein erweitertes ASCII Zeichen ist 
-                                   ;nur bei leerem Puffer erlaubt
-     JNZ  NOT_EXTENDED             ;Zeichen ist gÅltig
-                                   ;erweitertes Zeichen, melde Fehler
+    CALL    READ_CHAR
+    OR      AL,AL                    ;EIN ERWEITERTES ASCII ZEICHEN IST 
+                                     ;NUR BEI LEEREM PUFFER ERLAUBT
+    JNZ     NOT_EXTENDED             ;ZEICHEN IST GöLTIG
+                                     ;ERWEITERTES ZEICHEN, MELDE FEHLER
 
 ;----------------------------------------------------------------;
-; Meldet das Auftreten eines Fehler, indem es einen Signalton    ;
-; zum Bildschirm schickt: 07H                                    ;
+; MELDET DAS AUFTRETEN EINES FEHLER, INDEM ES EINEN SIGNALTON    ;
+; ZUM BILDSCHIRM SCHICKT: 07H                                    ;
 ;----------------------------------------------------------------;
 SIGNAL_ERROR:
-     PUSH DX
-     MOV  DL,7                     ;BetÑtige den Summer
-     MOV  AH,2
-     INT  21H
-     POP  DX
-     JMP  SHORT READ_NEXT_CHAR     ;Jetzt nÑchstes Zeichen einlesen
+    PUSH    DX
+    MOV     DL,7                     ;BETéTIGE DEN SUMMER
+    MOV     AH,2
+    INT     21H
+    POP     DX
+    JMP     SHORT READ_NEXT_CHAR     ;JETZT NéCHSTES ZEICHEN EINLESEN
 
 ;----------------------------------------------------------------;
-; Lîscht den Puffer der Zeichenkette und die eingegebenen        ;
-; Zeichen auf dem Bildschirm.                                    ;
+; LôSCHT DEN PUFFER DER ZEICHENKETTE UND DIE EINGEGEBENEN        ;
+; ZEICHEN AUF DEM BILDSCHIRM.                                    ;
 ;----------------------------------------------------------------;
 PURGE_BUFFER:
-     PUSH CX
-     MOV  CL,[SI]
-     XOR  CH,CH
+    PUSH    CX
+    MOV     CL,[SI]
+    XOR     CH,CH
 PURGE_LOOP:
-     CALL BACK_SPACE          ;BACK_SPACE bewahrt den Cursor davor,
-     LOOP PURGE_LOOP          ; zu weit zurÅck bewegt zu werden
+    CALL    BACK_SPACE  ;BACK_SPACE BEWAHRT DEN CURSOR DAVOR,
+    LOOP    PURGE_LOOP  ; ZU WEIT ZURöCK BEWEGT ZU WERDEN
 
-     POP  CX
-     JMP  START_OVER          ;Jetzt kînnen erweiterte ASCII Zeichen
-                              ; eingelesen werden, da der Puffer leer ist
+    POP     CX
+    JMP     START_OVER  ;JETZT KôNNEN ERWEITERTE ASCII ZEICHEN
+                        ; EINGELESEN WERDEN, DA DER PUFFER LEER IST
 
 ;----------------------------------------------------------------;
-; Der Puffer war voll und so konnten keine weiteren Zeichen mehr ;
-; eingelesen werden. Lîse einen Summton aus, um den Benutzer zu  ;
-; warnen.                                                        ;
+; DER PUFFER WAR VOLL UND SO KONNTEN KEINE WEITEREN ZEICHEN MEHR ;
+; EINGELESEN WERDEN. LôSE EINEN SUMMTON AUS, UM DEN BENUTZER ZU  ;
+; WARNEN.                                                        ;
 ;----------------------------------------------------------------;
 BUFFER_FULL:
-     JMP  SHORT SIGNAL_ERROR  ;Wenn Puffer voll ist, Summton auslîsen
+    JMP     SHORT SIGNAL_ERROR  ;WENN PUFFER VOLL IST, SUMMTON AUSLôSEN
 
 ;----------------------------------------------------------------;
-; Liest den erweiterten ASCII Code ein und legt ihn als einziges ;
-; Zeichen im Puffer ab, und gibt dann eine -1 als Anzahl der     ;
-; eingelesenen Zeichen zurÅck.                                   ;
+; LIEST DEN ERWEITERTEN ASCII CODE EIN UND LEGT IHN ALS EINZIGES ;
+; ZEICHEN IM PUFFER AB, UND GIBT DANN EINE -1 ALS ANZAHL DER     ;
+; EINGELESENEN ZEICHEN ZURöCK.                                   ;
 ;----------------------------------------------------------------;
 EXTENDED:
-     MOV  [SI+2],AH           ;Plaziert den Code in den Puffer
-     MOV  BL,0FFH             ;-1 als Kennung fÅr spezielle Taste
-     JMP  SHORT END_STRING
+    MOV     [SI+2],AH           ;PLAZIERT DEN CODE IN DEN PUFFER
+    MOV     BL,0FFH             ;-1 ALS KENNUNG FöR SPEZIELLE TASTE
+    JMP     SHORT END_STRING
 
 ;----------------------------------------------------------------;
-; Sichert die Anzahl der eingelesenen Zeichen und kehrt zurÅck.  ;
+; SICHERT DIE ANZAHL DER EINGELESENEN ZEICHEN UND KEHRT ZURöCK.  ;
 ;----------------------------------------------------------------;
-END_INPUT:                    ;Fertig mit einlesen
-     SUB  BL,2                ;Anzahl der eingelesenen Zeichen
+END_INPUT:              ;FERTIG MIT EINLESEN
+    SUB     BL,2        ;ANZAHL DER EINGELESENEN ZEICHEN
 END_STRING:
-     MOV  [SI+1],BL           ;öbergebe Anzahl der eingelesenen Zeichen
-     POP  SI
-     POP  BX
-     POP  AX
-     RET
-READ_STRING    ENDP
+    MOV     [SI+1],BL   ;öBERGEBE ANZAHL DER EINGELESENEN ZEICHEN
+    POP     SI
+    POP     BX
+    POP     AX
+    RET
+READ_STRING     ENDP
 ;================================================================;
 
 
 ;================================================================;
-     PUBLIC    BACK_SPACE
-     EXTRN     WRITE_CHAR:NEAR
+    PUBLIC    BACK_SPACE
+    EXTRN     WRITE_CHAR:NEAR
 ;----------------------------------------------------------------;
-; Diese Prozedur lîscht Zeichen fÅr Zeichen aus dem Puffer und   ;
-; vom Bildschirm, wenn der Puffer nicht leer ist. Sie kehrt      ;
-; zurÅck wenn der Puffer leer ist.                               ;
+; DIESE PROZEDUR LôSCHT ZEICHEN FöR ZEICHEN AUS DEM PUFFER UND   ;
+; VOM BILDSCHIRM, WENN DER PUFFER NICHT LEER IST. SIE KEHRT      ;
+; ZURöCK WENN DER PUFFER LEER IST.                               ;
 ;                                                                ;
-;    DS:SI+BX  'jÅngste' Zeichen im Puffer                       ;
+;    DS:SI+BX  'JöNGSTE' ZEICHEN IM PUFFER                       ;
 ;                                                                ;
-; Benutzt:     WRITE_CHAR                                        ;
+; BENUTZT:     WRITE_CHAR                                        ;
 ;----------------------------------------------------------------;
-BACK_SPACE     PROC NEAR      ;Lîsche ein Zeichen
-     PUSH AX
-     PUSH DX
-     CMP  BX,2                ;Ist der Puffer leer?
-     JE   END_BS              ;Ja: nÑchstes Zeichen einlesen
-     DEC  BX                  ;lîsche ein Zeichen aus dem Puffer
-     MOV  AH,2                ;lîsche ein Zeichen vom Bildschirm
-     MOV  DL,BS
-     INT  21H
-     MOV  DL,20H              ;Schreibe dort ein Leerzeichen
-     CALL WRITE_CHAR
-     MOV  DL,BS               ;geh wieder zurÅck
-     INT  21H
-END_BS:   POP  DX
-     POP  AX
-     RET
-BACK_SPACE     ENDP
+BACK_SPACE     PROC NEAR      ;LôSCHE EIN ZEICHEN
+    PUSH    AX
+    PUSH    DX
+    CMP     BX,2                ;IST DER PUFFER LEER?
+    JE      END_BS              ;JA: NéCHSTES ZEICHEN EINLESEN
+    DEC     BX                  ;LôSCHE EIN ZEICHEN AUS DEM PUFFER
+    MOV     AH,2                ;LôSCHE EIN ZEICHEN VOM BILDSCHIRM
+    MOV     DL,BS
+    INT     21H
+    MOV     DL,20H              ;SCHREIBE DORT EIN LEERZEICHEN
+    CALL    WRITE_CHAR
+    MOV     DL,BS               ;GEH WIEDER ZURöCK
+    INT     21H
+END_BS:     POP  DX
+    POP     AX
+    RET
+BACK_SPACE  ENDP
 ;================================================================;
 
 
 ;================================================================;
-     PUBLIC    READ_DECIMAL
+    PUBLIC  READ_DECIMAL
 ;----------------------------------------------------------------;
-; Diese Prozedur wandelt die dezimale Zeichenkette aus dem       ;
-; Ausgabe-Puffer von READ_STRING in ein Wort (2 Byte) um.        ;
+; DIESE PROZEDUR WANDELT DIE DEZIMALE ZEICHENKETTE AUS DEM       ;
+; AUSGABE-PUFFER VON READ_STRING IN EIN WORT (2 BYTE) UM.        ;
 ;                                                                ;
-;    AX   Ergebnis                                               ;
-;    CF   wird bei Fehler gesetzt, sonst gelîscht                ;
+;    AX   ERGEBNIS                                               ;
+;    CF   WIRD BEI FEHLER GESETZT, SONST GELôSCHT                ;
 ;                                                                ;
-; Benutzt:     READ_STRING                                       ;
-; Liest:       KEY_BOARD_INPUT, etc.                             ;
+; BENUTZT:     READ_STRING                                       ;
+; LIEST:       KEY_BOARD_INPUT, ETC.                             ;
 ;----------------------------------------------------------------;
 READ_DECIMAL   PROC NEAR
-     PUSH BX
-     PUSH CX
-     PUSH DX
-     MOV  CHAR_NUM_LIMIT,6    ;Maximal 5 Ziffern (65535)
-     LEA  DX,KEY_BOARD_INPUT
-     CALL READ_STRING
-     MOV  CL,NUM_CHARS_READ   ;Hole die Anzahl der eingelesenen Ziffern
-     XOR  CH,CH               ;Oberes Byte des ZÑhlers lîschen
-     CMP  CL,0                ;melde Fehler, falls keine Ziffer eingelesen
-     JLE  BAD_DECIMAL_DIGIT   ;nichts eingelesen, melde Fehler
-     XOR  AX,AX               ;Setze AX auf Null
-     XOR  BX,BX               ;Starte beim Anfang der Ziffernkette
+    PUSH    BX
+    PUSH    CX
+    PUSH    DX
+    MOV     CHAR_NUM_LIMIT,6    ;MAXIMAL 5 ZIFFERN (65535)
+    LEA     DX,KEY_BOARD_INPUT
+    CALL    READ_STRING
+    MOV     CL,NUM_CHARS_READ   ;HOLE DIE ANZAHL DER EINGELESENEN ZIFFERN
+    XOR     CH,CH               ;OBERES BYTE DES ZéHLERS LôSCHEN
+    CMP     CL,0                ;MELDE FEHLER, FALLS KEINE ZIFFER EINGELESEN
+    JLE     BAD_DECIMAL_DIGIT   ;NICHTS EINGELESEN, MELDE FEHLER
+    XOR     AX,AX               ;SETZE AX AUF NULL
+    XOR     BX,BX               ;STARTE BEIM ANFANG DER ZIFFERNKETTE
 CONVERT_DIGIT:
-     MOV  DX,10               ;Multiplikation mit 10
-     MUL  DX                  ;Multipliziere AX mit 10
-     JC   BAD_DECIMAL_DIGIT   ;bei öberlauf Carry-Flag setzen
-     MOV  DL,CHARS[BX]        ;Hole die nÑchste Ziffer
-     SUB  DL,'0'              ;Entferne die obersten 4 Bit
-     JS   BAD_DECIMAL_DIGIT   ;Keine Ziffer falls < 0
-     CMP  DL,9                ;Ist dies keine Zahl?
-     JA   BAD_DECIMAL_DIGIT   ;Ja
-     ADD  AX,DX               ;Nein: zum Ergebnis addieren
-     INC  BX                  ;Zeige auf nÑchstes Zeichen
-     LOOP CONVERT_DIGIT       ;Hole die nÑchste Zahl
+    MOV     DX,10               ;MULTIPLIKATION MIT 10
+    MUL     DX                  ;MULTIPLIZIERE AX MIT 10
+    JC      BAD_DECIMAL_DIGIT   ;BEI öBERLAUF CARRY-FLAG SETZEN
+    MOV     DL,CHARS[BX]        ;HOLE DIE NéCHSTE ZIFFER
+    SUB     DL,'0'              ;ENTFERNE DIE OBERSTEN 4 BIT
+    JS      BAD_DECIMAL_DIGIT   ;KEINE ZIFFER FALLS < 0
+    CMP     DL,9                ;IST DIES KEINE ZAHL?
+    JA      BAD_DECIMAL_DIGIT   ;JA
+    ADD     AX,DX               ;NEIN: ZUM ERGEBNIS ADDIEREN
+    INC     BX                  ;ZEIGE AUF NéCHSTES ZEICHEN
+    LOOP    CONVERT_DIGIT       ;HOLE DIE NéCHSTE ZAHL
 DONE_DECIMAL:
-     POP  DX
-     POP  CX
-     POP  BX
-     RET
+    POP     DX
+    POP     CX
+    POP     BX
+    RET
 BAD_DECIMAL_DIGIT:
-     STC                      ;Setze Carry-Flag um Fehler zu melden
-     JMP  DONE_DECIMAL
-READ_DECIMAL   ENDP
+    STC                      ;SETZE CARRY-FLAG UM FEHLER ZU MELDEN
+    JMP     DONE_DECIMAL
+READ_DECIMAL    ENDP
 ;================================================================;
 
 
 ;================================================================;
-     PUBLIC    READ_BYTE
+    PUBLIC  READ_BYTE
 ;----------------------------------------------------------------;
-; Diese Prozedur liest auch ein einzelnes ASCII Zeichen ein.     ;
-; Es ist eine Testversion von READ_BYTE !                        ;
+; DIESE PROZEDUR LIEST AUCH EIN EINZELNES ASCII ZEICHEN EIN.     ;
+; ES IST EINE TESTVERSION VON READ_BYTE !                        ;
 ;                                                                ;
-; Ergebnis     AL   ZeichenschlÅssel (wenn AH <> 0)              ;
-;              AH   1 falls ASCII Zeichen eingelesen             ;
-;                   0 falls kein Zeichen eingelesen wurde        ;
-;                  -1 falls spezielle Taste eingelesen           ;
+; ERGEBNIS     AL   ZEICHENSCHLöSSEL (WENN AH <> 0)              ;
+;              AH   1 FALLS ASCII ZEICHEN EINGELESEN             ;
+;                   0 FALLS KEIN ZEICHEN EINGELESEN WURDE        ;
+;                  -1 FALLS SPEZIELLE TASTE EINGELESEN           ;
 ;                                                                ;
-; Benutzt:     HEX_TO_BYTE, STRING_TO_UPPER, READ_STRING         ;
-; Liest:       KEY_BOARD_INPUT, etc.                             ;
+; BENUTZT:     HEX_TO_BYTE, STRING_TO_UPPER, READ_STRING         ;
+; LIEST:       KEY_BOARD_INPUT, ETC.                             ;
 ;----------------------------------------------------------------;
 READ_BYTE PROC NEAR
-     PUSH DX
-     MOV  CHAR_NUM_LIMIT,3    ;Nur 2 Zeichen erlaubt (+ CR)
-     LEA  DX,KEY_BOARD_INPUT
-     CALL READ_STRING
-     CMP  NUM_CHARS_READ,1    ;Untersuche wieviele Zeichen
-     JE   ASCII_INPUT         ;nur eins, als ASCII Zeichen behandeln
-     JB   NO_CHARACTERS       ;Nur Eingabetaste betÑtigt
-     CMP  NUM_CHARS_READ,0FFH ;Spezielle Taste betÑtigt?
-     JE   SPECIAL_KEY         ;Ja
-     CALL STRING_TO_UPPER     ;Nein: in Gro·buchstaben umwandeln
-     LEA  DX,CHARS            ;Adresse der umzuwandelnden Zeichenkette
-     CALL HEX_TO_BYTE         ;Wandel Hex-Zeichenkette in Byte um
-     JC   NO_CHARACTERS       ;Fehler, gebe 'nichts eingelesen' zurÅck
-     MOV  AH,1                ;Melde ein eingelesenes Zeichen
+    PUSH    DX
+    MOV     CHAR_NUM_LIMIT,3    ;NUR 2 ZEICHEN ERLAUBT (+ CR)
+    LEA     DX,KEY_BOARD_INPUT
+    CALL    READ_STRING
+    CMP     NUM_CHARS_READ,1    ;UNTERSUCHE WIEVIELE ZEICHEN
+    JE      ASCII_INPUT         ;NUR EINS, ALS ASCII ZEICHEN BEHANDELN
+    JB      NO_CHARACTERS       ;NUR EINGABETASTE BETéTIGT
+    CMP     NUM_CHARS_READ,0FFH ;SPEZIELLE TASTE BETéTIGT?
+    JE      SPECIAL_KEY         ;JA
+    CALL    STRING_TO_UPPER     ;NEIN: IN GRO·BUCHSTABEN UMWANDELN
+    LEA     DX,CHARS            ;ADRESSE DER UMZUWANDELNDEN ZEICHENKETTE
+    CALL    HEX_TO_BYTE         ;WANDEL HEX-ZEICHENKETTE IN BYTE UM
+    JC      NO_CHARACTERS       ;FEHLER, GEBE 'NICHTS EINGELESEN' ZURöCK
+    MOV     AH,1                ;MELDE EIN EINGELESENES ZEICHEN
 DONE_READ:
-     POP  DX
-     RET
+    POP     DX
+    RET
 NO_CHARACTERS:
-     XOR  AH,AH               ;Melde 'kein Zeichen eingelesen'
-     JMP  DONE_READ
+    XOR     AH,AH               ;MELDE 'KEIN ZEICHEN EINGELESEN'
+    JMP     DONE_READ
 ASCII_INPUT:
-     MOV  AL,CHARS            ;Lade eingelesenes Zeichen
-     MOV  AH,1                ;Melde ein eingelesenes Zeichen
-     JMP  DONE_READ
+    MOV     AL,CHARS            ;LADE EINGELESENES ZEICHEN
+    MOV     AH,1                ;MELDE EIN EINGELESENES ZEICHEN
+    JMP     DONE_READ
 SPECIAL_KEY:
-     MOV  AL,CHARS[0]         ;öbergebe den Scan-Code
-     MOV  AH,0FFH             ;Melde eine spezielle Taste
-     JMP  DONE_READ
-READ_BYTE ENDP
+    MOV     AL,CHARS[0]         ;öBERGEBE DEN SCAN-CODE
+    MOV     AH,0FFH             ;MELDE EINE SPEZIELLE TASTE
+    JMP     DONE_READ
+READ_BYTE   ENDP
 ;================================================================;
 
 
 ;================================================================;
-     PUBLIC    HEX_TO_BYTE
+    PUBLIC  HEX_TO_BYTE
 ;----------------------------------------------------------------;
-; Diese Prozedur wandelt zwei Hex-Zeichen in ein Byte um.        ;
+; DIESE PROZEDUR WANDELT ZWEI HEX-ZEICHEN IN EIN BYTE UM.        ;
 ;                                                                ;
-;    DS:DX     Adresse der beiden Hex-Zeichen                    ;
+;    DS:DX     ADRESSE DER BEIDEN HEX-ZEICHEN                    ;
 ;                                                                ;
-;    Ergebnis: AL   Byte                                         ;
-;              CF   Bei Fehler gesetzt, sonst gelîscht           ;
-;              AH   verÑndert                                    ;
+;    ERGEBNIS: AL   BYTE                                         ;
+;              CF   BEI FEHLER GESETZT, SONST GELôSCHT           ;
+;              AH   VERéNDERT                                    ;
 ;                                                                ;
-; Benutzt      CONVERT_HEX_DIGIT                                 ;
+; BENUTZT      CONVERT_HEX_DIGIT                                 ;
 ;----------------------------------------------------------------;
 HEX_TO_BYTE    PROC NEAR
-     PUSH BX
-     PUSH CX
-     MOV  BX,DX               ;Lade BX um indirekt zu adressieren
-     MOV  AL,[BX]             ;Hole erste Ziffer
-     CALL CONVERT_HEX_DIGIT
-     JC   BAD_HEX             ;Keine Hex-Ziffer wenn Carry gesetzt ist
-     MOV  CX,4                ;jetzt mit 16 multiplizieren
-     SHL  AL,CL
-     MOV  AH,AL               ;lege ein Kopie an
-     INC  BX                  ;Hole die zweite Ziffer
-     MOV  AL,[BX]
-     CALL CONVERT_HEX_DIGIT
-     JC   BAD_HEX             ;Keine Hex-Ziffer wenn Carry gesetzt ist
-     OR   AL,AH               ;FÅge die zwei Halb-Bytes zusammen
-     CLC                      ;Lîsche Carry-Flag, da fehlerfrei
+    PUSH    BX
+    PUSH    CX
+    MOV     BX,DX               ;LADE BX UM INDIREKT ZU ADRESSIEREN
+    MOV     AL,[BX]             ;HOLE ERSTE ZIFFER
+    CALL    CONVERT_HEX_DIGIT
+    JC      BAD_HEX             ;KEINE HEX-ZIFFER WENN CARRY GESETZT IST
+    MOV     CX,4                ;JETZT MIT 16 MULTIPLIZIEREN
+    SHL     AL,CL
+    MOV     AH,AL               ;LEGE EIN KOPIE AN
+    INC     BX                  ;HOLE DIE ZWEITE ZIFFER
+    MOV     AL,[BX]
+    CALL    CONVERT_HEX_DIGIT
+    JC      BAD_HEX             ;KEINE HEX-ZIFFER WENN CARRY GESETZT IST
+    OR      AL,AH               ;FöGE DIE ZWEI HALB-BYTES ZUSAMMEN
+    CLC                         ;LôSCHE CARRY-FLAG, DA FEHLERFREI
 DONE_HEX:
-     POP  CX
-     POP  BX
-     RET
+    POP     CX
+    POP     BX
+    RET
 BAD_HEX:
-     STC                      ;Setze Carry-Flag, da Fehler aufgetreten
-     JMP  DONE_HEX
+    STC                         ;SETZE CARRY-FLAG, DA FEHLER AUFGETRETEN
+    JMP     DONE_HEX
 HEX_TO_BYTE    ENDP
 ;================================================================;
 
 
 ;================================================================;
-     PUBLIC    CONVERT_HEX_DIGIT
+    PUBLIC  CONVERT_HEX_DIGIT
 ;----------------------------------------------------------------;
-; Diese Prozedur wandelt ein ASCII HEX-Zeichen in ein Halb-Byte  ;
-; (4 Bit)                                                        ;
-; um.                                                            ;
+; DIESE PROZEDUR WANDELT EIN ASCII HEX-ZEICHEN IN EIN HALB-BYTE  ;
+; (4 BIT)                                                        ;
+; UM.                                                            ;
 ;                                                                ;
-;              AL   umzuwandelndes Zeichen                       ;
-; Ergebnis:    AL   Halb-Byte                                    ;
-;              CF   Bei Fehler gesetzt, sonst gelîscht           ;
+;              AL   UMZUWANDELNDES ZEICHEN                       ;
+; ERGEBNIS:    AL   HALB-BYTE                                    ;
+;              CF   BEI FEHLER GESETZT, SONST GELôSCHT           ;
 ;----------------------------------------------------------------;
 CONVERT_HEX_DIGIT   PROC NEAR
-     CMP  AL,'0'              ;ist es eine erlaubte Ziffer?
-     JB   BAD_DIGIT           ;Nee
-     CMP  AL,'9'              ;Noch nicht ganz sicher
-     JA   TRY_HEX             ;Kînnte noch eine Hex-Ziffer sein
-     SUB  AL,'0'              ;Es ist eine Dezimalzahl, umwandeln
-     CLC                      ;Lîsche Carry-Flag, kein Fehler aufgetreten
-     RET
+    CMP     AL,'0'              ;IST ES EINE ERLAUBTE ZIFFER?
+    JB      BAD_DIGIT           ;NEE
+    CMP     AL,'9'              ;NOCH NICHT GANZ SICHER
+    JA      TRY_HEX             ;KôNNTE NOCH EINE HEX-ZIFFER SEIN
+    SUB     AL,'0'              ;ES IST EINE DEZIMALZAHL, UMWANDELN
+    CLC                         ;LôSCHE CARRY-FLAG, KEIN FEHLER AUFGETRETEN
+    RET
 TRY_HEX:
-     CMP  AL,'A'              ;Noch nicht sicher
-     JB   BAD_DIGIT           ;Keine Hex-Ziffer
-     CMP  AL,'F'              ;Noch nicht sicher
-     JA   BAD_DIGIT           ;Keine Hex-Ziffer
-     SUB  AL,'A'-10           ;Ist Hex-Ziffer, umwandeln
-     CLC                      ;Lîsche Carry-Flag, kein Fehler aufgetreten
-     RET
+    CMP     AL,'A'              ;NOCH NICHT SICHER
+    JB      BAD_DIGIT           ;KEINE HEX-ZIFFER
+    CMP     AL,'F'              ;NOCH NICHT SICHER
+    JA      BAD_DIGIT           ;KEINE HEX-ZIFFER
+    SUB     AL,'A'-10           ;IST HEX-ZIFFER, UMWANDELN
+    CLC                         ;LôSCHE CARRY-FLAG, KEIN FEHLER AUFGETRETEN
+    RET
 BAD_DIGIT:
-     STC                      ;Setze Carry-Flag, Fehler aufgetreten
-     RET
+    STC                         ;SETZE CARRY-FLAG, FEHLER AUFGETRETEN
+    RET
 CONVERT_HEX_DIGIT   ENDP
 ;================================================================;
 
@@ -448,4 +447,3 @@ CODE_SEG    ENDS
 ; THE COMMERCIAL USE OF THIS CODE IS NOT PERMITTED.              ;
 ; (C) 1988 BY MARKT & TECHNIK VERLAG AKTIENGESELLSCHAFT.         ;
 ;================================================================;
-
