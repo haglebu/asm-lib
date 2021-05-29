@@ -20,11 +20,7 @@ No input validation takes place! So please only enter 00 or 01.
 
 # Library Files
 ## media.asm
-This file contains the procedures for displaying drive media information on the screen:
-- media descriptor byte
-- bytes per sector
-- total number of clusters
-- sectors per cluster
+This file contains the procedures for displaying drive media information on the screen.
 
 ## sector.asm
 This file contains the procedures for displaying a sector on the screen.
