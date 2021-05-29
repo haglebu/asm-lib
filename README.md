@@ -10,7 +10,7 @@ Display media information (MI) about drive A:. The drive is currently static; th
 ## bpb.asm
 Display BIOS parameter block information (BPB) about drive A:. The drive is currently static; this will be changed later. Here the complete first sector of drive A is read into the RAM and then interpreted.
 
-<img width="596" alt="bpb" src="https://user-images.githubusercontent.com/52176362/120019548-e168ed00-bfe8-11eb-8eb8-463229004d99.png">
+<img width="699" alt="BPB" src="https://user-images.githubusercontent.com/52176362/120073516-e8e7cf00-c098-11eb-9050-75749fda5a66.png">
 
 # Library Files
 ## media.asm
