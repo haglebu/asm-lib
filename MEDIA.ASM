@@ -43,7 +43,6 @@
 ;================================================================;
 
 
-
 ;-----------------------------------------------------------------
 ; LABEL CODE SEGMENT AND DATA SEGMENT AND LINK THEM TO A 'SINGLE' 
 ; 64 KBYTE SEGMENT WITH THE NAME 'CGROUP'. SEE PNAB, K14, S156
@@ -58,7 +57,6 @@ DATA_SEG    ENDS
 CODE_SEG    SEGMENT PUBLIC
 
 
-
 ;-----------------------------------------------------------------
 ; EXTERNAL PROCEDURES           VIDEO.ASM (PNAB)
 ;-----------------------------------------------------------------
@@ -66,7 +64,6 @@ CODE_SEG    SEGMENT PUBLIC
         EXTRN   WRITE_DECIMAL:NEAR
         EXTRN   CURSOR_RIGHT:NEAR
         EXTRN   WRITE_STRING:NEAR
-
 
 
 ;================================================================;
@@ -101,7 +98,6 @@ WRITE_MDS       ENDP
 ;================================================================;
 
 
-
 ;================================================================;
         PUBLIC  WRITE_BPS
 ;----------------------------------------------------------------;
@@ -126,23 +122,14 @@ WRITE_BPS       PROC NEAR
         CALL    WRITE_DECIMAL   ; WRITE BPS (DEZIMAL)
         CALL    CURSOR_RIGHT
         
-        POP     DS                      ; RESTORE DATA SEGMENT
-        
-;        MOV     DL,CH
-;        CALL    WRITE_HEX               ; HIGH BYTE
-;        MOV     DL,CL
-;        CALL    WRITE_HEX               ; LOW BYTE
-;        MOV     DX,OFFSET CGROUP:S_HEX  ; DS:DX
-;        CALL    WRITE_STRING            ; WRITE BPS (HEX)        
-
-        POP     DX                      ; ... RESTORE THE REST
+        POP     DS              ; RESTORE DATA SEGMENT     
+        POP     DX              ; ... RESTORE THE REST
         POP     CX
         POP     BX
         POP     AX
         RET
 WRITE_BPS       ENDP
 ;================================================================;
-
 
 
 ;================================================================;
@@ -176,7 +163,6 @@ WRITE_NCL       ENDP
 ;================================================================;
 
 
-
 ;================================================================;
         PUBLIC  WRITE_SPC
 ;----------------------------------------------------------------;
@@ -207,7 +193,6 @@ WRITE_SPC       PROC NEAR
         RET
 WRITE_SPC       ENDP
 ;================================================================;
-
 
 
 ;================================================================;

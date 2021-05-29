@@ -22,14 +22,12 @@
 ;================================================================;
 
 
-
 ;-----------------------------------------------------------------
 ; LABEL CODE SEGMENT AND DATA SEGMENT AND LINK THEM TO A 'SINGLE' 
 ; 64 KBYTE SEGMENT WITH THE NAME 'CGROUP'. SEE PNAB, K14, S156
 ;-----------------------------------------------------------------
 CGROUP      GROUP     CODE_SEG, DATA_SEG
             ASSUME    CS:CGROUP, DS:CGROUP
-
 
 
 ;================================================================;
@@ -63,7 +61,6 @@ DISP_HALF_SECTOR    ENDP
 ;================================================================;
 
 
-
 ;================================================================;
     PUBLIC  DISP_BPB
     EXTRN   SEND_CRLF:NEAR
@@ -90,7 +87,6 @@ DISP_BPB    ENDP
 ;================================================================;
 
 
-
 ;================================================================;
     PUBLIC  DISP_LINE
     EXTRN   WRITE_HEX:NEAR
@@ -108,7 +104,7 @@ DISP_LINE PROC NEAR
     PUSH    DX
     MOV     BX,DX               ;OFFSET IST IN BX SINNVOLLER
     MOV     CX,16               ;ANZAHL DER AUSZUGEBENDEN BYTES
-    PUSH    BX                  ;OFFSET FÜR ASCII_LOOP SICHERN
+    PUSH    BX                  ;OFFSET FšR ASCII_LOOP SICHERN
 HEX_LOOP:
     MOV     DL,SECTOR[BX]       ;HOLE 1 BYTE
     CALL    WRITE_HEX           ;GIB DIESES BYTE IN HEX AUS
@@ -118,7 +114,7 @@ HEX_LOOP:
     INC     BX
     LOOP    HEX_LOOP
 
-    MOV     DL,' '              ;FÜGE EIN LEERZEICHEN VOR DEM  
+    MOV     DL,' '              ;FšGE EIN LEERZEICHEN VOR DEM  
                                ; ZEICHEN AN
     CALL WRITE_CHAR
     MOV     CX,16
@@ -140,11 +136,10 @@ DISP_LINE   ENDP
 CODE_SEG    ENDS                  ; CODE SEGMENT ENDS HERE
 
      
-     
 ;================================================================;
 DATA_SEG    SEGMENT PUBLIC      ; DATA SEGMENT STARTS HERE
      PUBLIC     SECTOR
-SECTOR      DB  8192 DUP (0)
+SECTOR      DB  512 DUP (0)     ; SECTOR COMES HERE
 
 DATA_SEG    ENDS                ; DATA SEGMENT ENDS HERE
 

@@ -95,28 +95,27 @@ CODE_SEG        ENDS
 ;-----------------------------------------------------------------
 DATA_SEG        SEGMENT PUBLIC
 S_VER           DB 'BPB - BIOS PARAMETER BLOCK, '
-                DB 'V0.9, '
+                DB 'V1.0, '
                 DB 'CC-BY-NC-SA 4.0, '
-                DB 'THOMAS BRASE, 2021', 0H
+                DB 'THOMAS BRASE, 29.05.2021', 0H
 
                                                     ; OFFSET
-S_SID           DB 'SYSTEM ID              : ', 0H  ; 0003
-S_BPS           DB 'BYTES PER SECTOR       : ', 0H  ; 000B
-S_TLS           DB 'TOTAL LOGICAL SECTORS  : ', 0H  ; 0013
-S_MDS           DB 'MEDIA DESCRIPTOR       : ', 0H  ; 0015
-S_SPT           DB 'SECTORS PER TRACK      : ', 0H  ; 0018
-S_NOH           DB 'NUMBER OF HEADS        : ', 0H  ; 001A
-S_VOL           DB 'VOLUME LABEL           : ', 0H  ; 002B
-S_FST           DB 'FILE SYSTEM TYPE       : ', 0H  ; 0036
-
-;S_NLW           DB 'DRIVE NUMBER           : ', 0H           
-
-;S_NCL           DB 'NUMBER OF CLUSTERS     : ', 0H
-;S_SPC           DB 'SECTORS PER CLUSTER    : ', 0H
+S_SID           DB 'SYSTEM ID              : ', 0H  ; 0003 / 8 BYTE
+S_BPS           DB 'BYTES PER SECTOR       : ', 0H  ; 000B / WORD
+S_SPC           DB 'SECTORS PER CLUSTER    : ', 0H  ; 000D / BYTE
+S_NOF           DB 'NUMBER OF FATS         : ', 0H  ; 0010 / BYTE
+S_RDE           DB 'ROOT DIRECTOTY ENTRIES : ', 0H  ; 0011 / WORD
+S_TLS           DB 'TOTAL LOGICAL SECTORS  : ', 0H  ; 0013 / WORD
+S_MDS           DB 'MEDIA DESCRIPTOR       : ', 0H  ; 0015 / BYTE
+S_SPT           DB 'SECTORS PER TRACK      : ', 0H  ; 0018 / WORD
+S_NOH           DB 'NUMBER OF HEADS        : ', 0H  ; 001A / WORD
+S_PDN           DB 'PHYSICAL DRIVE NUMBER  : ', 0H  ; 0024 / BYTE
+S_VSN           DB 'VOLUME SERIAL NUMBER   : ', 0H  ; 0027 / DWORD
+S_VOL           DB 'VOLUME LABEL           : ', 0H  ; 002B / 11 BYTE
+S_FST           DB 'FILE SYSTEM TYPE       : ', 0H  ; 0036 / 8 BYTE
 
                 EXTRN     SECTOR:BYTE   ; MEMORY LOCATION FOR SECTOR
                                         ;  SEE SECTOR.ASM
-                
 DATA_SEG        ENDS             
 
 
@@ -184,7 +183,11 @@ START   PROC    NEAR
         MOV     DX,OFFSET CGROUP:S_VER  ; DISPLAY VERSION
         CALL    WRITE_STRING
         CALL    SEND_CRLF
-        CALL    SEND_CRLF
+
+        MOV     DL,'-'
+        MOV     CX,80D
+        CALL    WRITE_CHAR_N_TIMES
+
 
 ;-----------------------------------------------------------------
 ; READ COMPLETE BOOTSECTOR (512 BYTE) FROM DRIVE A: TO [SECTOR]
@@ -199,11 +202,14 @@ START   PROC    NEAR
         XOR     DX,DX               ; SET OFFSET TO 0 (FOR 
                                     ;  SECTOR ZERO)
         CALL    DISP_BPB            ; DISPLAY THE BPB
-        CALL    SEND_CRLF
         
+        MOV     DL,'-'
+        MOV     CX,80D
+        CALL    WRITE_CHAR_N_TIMES
+
 
 ;-----------------------------------------------------------------
-; DISPLAY/WRITE INFORMATION ON SCREEN / SYSTEM ID / +03H
+; WRITE INFORMATION ON SCREEN / SYSTEM ID / +03H / 8 BYTE
 ;-----------------------------------------------------------------
         MOV     DX,OFFSET CGROUP:S_SID
         CALL    WRITE_STRING
@@ -220,7 +226,7 @@ L_SID:
 
 
 ;-----------------------------------------------------------------
-; DISPLAY/WRITE INFORMATION ON SCREEN / VOLUME LABEL / +2BH
+; WRITE INFORMATION ON SCREEN / VOLUME LABEL / +2BH / 11 BYTE
 ;-----------------------------------------------------------------
         MOV     DX,OFFSET CGROUP:S_VOL
         CALL    WRITE_STRING
@@ -237,7 +243,7 @@ L_VOL:
 
 
 ;-----------------------------------------------------------------
-; DISPLAY/WRITE INFORMATION ON SCREEN / FILE SYSTEM TYPE / +36H
+; WRITE INFORMATION ON SCREEN / FILE SYSTEM TYPE / +36H / 8 BYTE
 ;-----------------------------------------------------------------
         MOV     DX,OFFSET CGROUP:S_FST
         CALL    WRITE_STRING
@@ -250,11 +256,35 @@ L_FST:
         INC     BX
         LOOP    L_FST
 
-        CALL    SEND_CRLF        
-
-
+        CALL    SEND_CRLF
+        
+         
 ;-----------------------------------------------------------------
-; DISPLAY/WRITE INFORMATION ON SCREEN / MEDIA DESCRIPTOR / +15H
+; WRITE INFORMATION ON SCREEN / VOL SER NUMBER / +27H / DWORD
+;-----------------------------------------------------------------
+        MOV     DX,OFFSET CGROUP:S_VSN
+        CALL    WRITE_STRING
+
+        XOR     DX,DX
+        MOV     BX,DX
+     
+        MOV     DL,SECTOR[BX+2AH]
+        CALL    WRITE_HEX           ; ONLY 1 BYTE
+        MOV     DL,SECTOR[BX+29H]
+        CALL    WRITE_HEX           ; ONLY 1 BYTE   
+        
+        MOV     DL,'-'
+        CALL    WRITE_CHAR
+   
+        MOV     DL,SECTOR[BX+28H]
+        CALL    WRITE_HEX           ; ONLY 1 BYTE          
+        MOV     DL,SECTOR[BX+27H]
+        CALL    WRITE_HEX           ; ONLY 1 BYTE        
+        CALL    SEND_CRLF
+
+        
+;-----------------------------------------------------------------
+; WRITE INFORMATION ON SCREEN / MEDIA DESCRIPTOR / +15H / BYTE
 ;-----------------------------------------------------------------
         MOV     DX,OFFSET CGROUP:S_MDS
         CALL    WRITE_STRING
@@ -263,10 +293,22 @@ L_FST:
         MOV     DL,SECTOR[BX+15H]
         CALL    WRITE_HEX           ; ONLY 1 BYTE          
         CALL    SEND_CRLF
+        
+        
+;-----------------------------------------------------------------
+; WRITE INFORMATION ON SCREEN / PHYS DRIVE NUMBER / +24H / BYTE
+;-----------------------------------------------------------------
+        MOV     DX,OFFSET CGROUP:S_PDN
+        CALL    WRITE_STRING
+
+        XOR     BX,BX
+        MOV     DL,SECTOR[BX+24H]
+        CALL    WRITE_HEX           ; ONLY 1 BYTE          
+        CALL    SEND_CRLF
 
 
 ;-----------------------------------------------------------------
-; DISPLAY/WRITE INFORMATION ON SCREEN / BYTES PER SECTOR / +0BH
+; WRITE INFORMATION ON SCREEN / BYTES PER SECTOR / +0BH / WORD
 ;-----------------------------------------------------------------
         MOV     DX,OFFSET CGROUP:S_BPS
         CALL    WRITE_STRING
@@ -280,20 +322,21 @@ L_FST:
 
 
 ;-----------------------------------------------------------------
-; DISPLAY/WRITE INFORMATION ON SCREEN / SECTORS PER TRACK / +18H
+; WRITE INFORMATION ON SCREEN / SECTORS PER TRACK / +18H / WORD
 ;-----------------------------------------------------------------
         MOV     DX,OFFSET CGROUP:S_SPT
         CALL    WRITE_STRING
 
         XOR     DX,DX
-        MOV     BX,DX
+        MOV     BX,DX     
         MOV     DL,SECTOR[BX+18H]
-        CALL    WRITE_HEX
+        MOV     DH,SECTOR[BX+19H]
+        CALL    WRITE_DECIMAL       ; 2 BYTE / WORD 
         CALL    SEND_CRLF
         
         
 ;-----------------------------------------------------------------
-; DISPLAY/WRITE INFORMATION ON SCREEN / NUMBER OF HEADS / +1AH
+; WRITE INFORMATION ON SCREEN / NUMBER OF HEADS / +1AH / WORD
 ;-----------------------------------------------------------------
         MOV     DX,OFFSET CGROUP:S_NOH
         CALL    WRITE_STRING
@@ -301,12 +344,13 @@ L_FST:
         XOR     DX,DX
         MOV     BX,DX
         MOV     DL,SECTOR[BX+1AH]
-        CALL    WRITE_HEX
+        MOV     DH,SECTOR[BX+1BH]
+        CALL    WRITE_DECIMAL       ; 2 BYTE / WORD     
         CALL    SEND_CRLF        
 
 
 ;-----------------------------------------------------------------
-; DISPLAY/WRITE INFORMATION ON SCREEN / TOTAL SECTORS / +13H
+; WRITE INFORMATION ON SCREEN / TOTAL SECTORS / +13H / WORD
 ;-----------------------------------------------------------------
         MOV     DX,OFFSET CGROUP:S_TLS
         CALL    WRITE_STRING
@@ -317,6 +361,33 @@ L_FST:
         MOV     DH,SECTOR[BX+14H]
         CALL    WRITE_DECIMAL       ; 2 BYTE / WORD          
         CALL    SEND_CRLF
+        
+        
+;-----------------------------------------------------------------
+; WRITE INFORMATION ON SCREEN / ROOT DIR ENTRIES / +11H / WORD
+;-----------------------------------------------------------------
+        MOV     DX,OFFSET CGROUP:S_RDE
+        CALL    WRITE_STRING
+
+        XOR     DX,DX
+        MOV     BX,DX
+        MOV     DL,SECTOR[BX+11H]
+        MOV     DH,SECTOR[BX+12H]
+        CALL    WRITE_DECIMAL       ; 2 BYTE / WORD          
+        CALL    SEND_CRLF
+        
+        
+;-----------------------------------------------------------------
+; WRITE INFORMATION ON SCREEN / NUMBER OF FATs / +10H / byte
+;-----------------------------------------------------------------
+        MOV     DX,OFFSET CGROUP:S_NOF
+        CALL    WRITE_STRING
+
+        XOR     DX,DX
+        MOV     BX,DX
+        MOV     DL,SECTOR[BX+10H]
+        CALL    WRITE_HEX           ; ONLY 1 BYTE       
+        CALL    SEND_CRLF        
 
 
         INT     20H                 ; BACK TO DOS

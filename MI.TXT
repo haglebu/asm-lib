@@ -1,0 +1,8 @@
+MI-Media Information, V1.0.(09), CC BY-NC-SA 4.0, Thomas Brase, 2021
+drive number       : 0
+media descriptor   : FD
+bytes per sector   : 512
+number of clusters : 354
+sectors per cluster: 2
+
+

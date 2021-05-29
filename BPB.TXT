@@ -1,0 +1,17 @@
+BPB - BIOS PARAMETER BLOCK, V1.0, CC-BY-NC-SA 4.0, THOMAS BRASE, 29.05.2021
+--------------------------------------------------------------------------------EB 3C 90 4D 53 44 4F 53 35 2E 30 00 02 02 01 00  ë<MSDOS5.0.....
+02 70 00 D0 02 FD 02 00 09 00 02 00 00 00 00 00  .p.Ð.ý..........
+00 00 00 00 00 00 29 FF 17 2D 23 56 4F 4C 55 4D  ......)ÿ.-#VOLUM
+45 4C 41 42 45 4C 46 41 54 31 32 20 20 20 FA 33  ELABELFAT12   ú3
+--------------------------------------------------------------------------------SYSTEM ID              : MSDOS5.0
+VOLUME LABEL           : VOLUMELABEL
+FILE SYSTEM TYPE       : FAT12   
+VOLUME SERIAL NUMBER   : 232D-17FF
+MEDIA DESCRIPTOR       : FD
+PHYSICAL DRIVE NUMBER  : 00
+BYTES PER SECTOR       : 512
+SECTORS PER TRACK      : 9
+NUMBER OF HEADS        : 2
+TOTAL LOGICAL SECTORS  : 720
+ROOT DIRECTOTY ENTRIES : 112
+NUMBER OF FATS         : 02
