@@ -3,14 +3,20 @@ My assembler programs and library files. I use the Microsoft Assembler MASM vers
 
 # Program Files
 ## mi.asm
-Display media information (MI) about drive A:. The drive is currently static; this will be changed later.
+Display media information (MI) about floppy disk in drive A:. The drive is currently static; maybe this will be changed later.
 
 <img width="589" alt="mi" src="https://user-images.githubusercontent.com/52176362/120019902-4c1a2880-bfe9-11eb-97e1-3d1a3985ce7c.png">
 
 ## bpb.asm
-Display BIOS parameter block information (BPB) about drive A:. The drive is currently static; this will be changed later. Here the complete first sector of drive A is read into the RAM and then interpreted.
+Display BIOS parameter block information (BPB) of a floppy disk. The complete first sector is read into the RAM and then interpreted.
 
-<img width="699" alt="BPB" src="https://user-images.githubusercontent.com/52176362/120073516-e8e7cf00-c098-11eb-9050-75749fda5a66.png">
+You will be prompted to enter the number of the floppy drive. Please enter:
+- 00 --> drive A:
+- 01 --> drive B:
+
+No input validation takes place! So please only enter 00 or 01.
+
+<img width="691" alt="Bildschirmfoto" src="https://user-images.githubusercontent.com/52176362/120079611-fb700180-c0b4-11eb-8c53-731354da0c93.png">
 
 # Library Files
 ## media.asm
@@ -29,8 +35,11 @@ This file contains the procedures for controlling the cursor.
 ## video.asm
 This file contains the procedures for the screen output.
 
+## keyboard.asm
+This files contains the procedures for the keyboard input.
+
 # Used Source Code
-## video.asm, cursor.asm, sector.asm
+## sector.asm, cursor.asm, video.asm, keyboard.asm
 
 PETER NORTON'S ASSEMBLERBUCH (PNAB)<br>
 MARKT & TECHNIK VERLAG AG, 1988<br>
